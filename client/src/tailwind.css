@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.text-xl {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.text-3xl {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.font-extrabold {
+  font-weight: 900;
+}
