@@ -3,6 +3,7 @@ import {BrowserRouter,Routes,Route} from 'react-router-dom';
 import Signup from './components/Signup.jsx';
 import Login from './components/Login.jsx';
 import Home from './components/Home.jsx';
+import Pinned from './components/Pinned.jsx';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
       <Route path='/' element={<Home />}></Route>
       <Route path='/register' element={<Signup />}></Route>
       <Route path='/login' element={<Login />}></Route>
+      <Route path='/pinned' element={<Pinned />}></Route>
     </Routes>
     </BrowserRouter>
     

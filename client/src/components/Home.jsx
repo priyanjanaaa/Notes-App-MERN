@@ -1,6 +1,8 @@
 import React from 'react'
-import { useState,useEffect } from 'react'
+import { useState,useEffect, } from 'react'
 import axios from 'axios'
+import {Link,useNavigate} from 'react-router-dom'
+
 
 const pastelCards = [
   "bg-[#FFF1F5]", // rose
@@ -10,6 +12,7 @@ const pastelCards = [
 ];
 
 const Home = () => {
+  const navigate=useNavigate();
   const[search,setSearch]=useState('');
   const[notes,setNotes]=useState([]);
   const[addNotes,setAddNotes]=useState(false);
@@ -25,7 +28,8 @@ const Home = () => {
           Authorization:`Bearer ${localStorage.getItem('token')}`
         }
     })
-    setNotes(response.data);
+    const sorted=response.data.sort((a,b)=>b.isPinned-a.isPinned)
+    setNotes(sorted);
 
       }catch(e){
         if(e.response && e.response.data){
@@ -131,6 +135,46 @@ const Home = () => {
 
   const debouncedSearch=debounce(handleSearch,500);
 
+  const handlePin=async(noteId)=>{
+    try{
+      const response=await axios.patch(`http://localhost:5001/notes/pin/${noteId}`,{},{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      loadData();
+
+    }catch(e){
+      if(e.response && e.response.data){
+        setError(e.response.data);
+      }
+      else{
+        setError("Something went wrong");
+      }
+
+    }
+  }
+
+    const handleUnpin=async(noteId)=>{
+    try{
+      const response=await axios.patch(`http://localhost:5001/notes/unpin/${noteId}`,{},{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      loadData();
+
+    }catch(e){
+      if(e.response && e.response.data){
+        setError(e.response.data);
+      }
+      else{
+        setError("Something went wrong");
+      }
+
+    }
+  }
+
  
   return (
       <div className="flex min-h-screen bg-[#FFFDF9]">
@@ -149,9 +193,9 @@ const Home = () => {
           <p className="cursor-pointer text-l font-bold tracking-wide text-[#2E2E2E]">
             All Notes
           </p>
-          <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
+          <Link to="/pinned" className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide" >
             Pinned
-          </p>
+          </Link>
           <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Archive
           </p>
@@ -206,27 +250,33 @@ const Home = () => {
             >
               {notes.map((note, i) => (
                 <div
-  key={note._id}
-  className={`rounded-[14px] shadow-md p-5 flex flex-col ${pastelCards[i % pastelCards.length]} 
-  w-[260px] h-[240px] mt-6`}   // fixed width + fixed height
->
-  <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
-    <h3 className="text-lg font-semibold">{note.title}</h3>
-    <p className="text-sm mt-2 text-[#555] leading-5">
-      {note.body}
-    </p>
-  </div>
+                  key={note._id}
+                  className={`rounded-[14px] shadow-md p-5 flex flex-col ${pastelCards[i % pastelCards.length]} 
+                  w-[260px] h-[240px] mt-6`}   
+                >
+                  <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
+                    <h3 className="text-lg font-semibold">{note.title}</h3>
+                    <p className="text-sm mt-2 text-[#555] leading-5">
+                      {note.body}
+                    </p>
+                  </div>
 
-  <div className="flex justify-end mt-2 gap-x-4">
-  <button>pin</button>
-  <button
-    onClick={() => handleDelete(note._id)}
-    className="text-sm text-red-500 hover:underline"
-  >
-    Delete
-  </button>
-</div>
-</div>
+                  <div className="flex justify-end mt-2 gap-x-4">
+                    {note.isPinned ?(
+                      <button onClick={()=>handleUnpin(note._id)} className="text-blue-600">Unpin</button>):(
+                      <button onClick={()=>handlePin(note._id)}className="text-blue-600">Pin</button>
+
+
+                    )}
+                  
+                  <button
+                    onClick={() => handleDelete(note._id)}
+                    className="text-sm text-red-500 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+                </div>
               ))}
             </div>
 
