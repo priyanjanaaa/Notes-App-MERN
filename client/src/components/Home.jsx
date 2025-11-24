@@ -28,7 +28,8 @@ const Home = () => {
           Authorization:`Bearer ${localStorage.getItem('token')}`
         }
     })
-    const sorted=response.data.sort((a,b)=>b.isPinned-a.isPinned)
+    const sorted=response.data.filter((n)=>!n.isDeleted)
+    .sort((a,b)=>b.isPinned-a.isPinned)
     setNotes(sorted);
 
       }catch(e){
@@ -81,7 +82,7 @@ const Home = () => {
 
     const handleDelete=async(noteId)=>{
       try{
-        const response=await axios.delete(`http://localhost:5001/notes/${noteId}`,{
+        const response=await axios.patch(`http://localhost:5001/notes/delete/${noteId}`,{},{
           headers:{
             Authorization:`Bearer ${localStorage.getItem('token')}`
           }
@@ -97,6 +98,7 @@ const Home = () => {
 
       }
     }
+    
 
  
 
@@ -199,9 +201,9 @@ const Home = () => {
           <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Archive
           </p>
-          <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
+          <Link to='/trash' className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Trash
-          </p>
+          </Link>
           
         </nav>
       </aside>

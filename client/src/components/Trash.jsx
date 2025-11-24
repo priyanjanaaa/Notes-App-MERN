@@ -1,28 +1,29 @@
 import React from 'react'
-import{useState,useEffect} from 'react'
+import { useState,useEffect } from 'react';
+import {Link} from 'react-router-dom'
 import axios from 'axios'
-import{Link} from 'react-router-dom'
 
 const pastelCards = [
-  "bg-[#FFF1F5]", 
-  "bg-[#F1F5FF]",
-  "bg-[#FDF8C9]",
-  "bg-[#E9FDF3]",
+  "bg-[#FFF1F5]", // rose
+  "bg-[#F1F5FF]", // blue
+  "bg-[#FDF8C9]", // yellow
+  "bg-[#E9FDF3]", // mint
 ];
 
-const Pinned = () => {
+const Trash = () => {
     const[error,setError]=useState('');
-    const[notes,setNotes]=useState([]);
     const[search,setSearch]=useState('');
+    const[notes,setNotes]=useState([]);
 
     const loadData=async()=>{
         try{
-            const response=await axios.get(`http://localhost:5001/notes/pin`,{
+            const response=await axios.get(`http://localhost:5001/notes/delete`,{
                 headers:{
-                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                    Authorization:`Bearer ${localStorage.getItem('token')}`
                 }
-            });
-            setNotes(response.data);
+            })
+            setNotes(response.data.filter((n)=>n.isDeleted));
+
         }catch(e){
             if(e.response && e.response.data){
                 setError(e.response.data);
@@ -38,42 +39,57 @@ const Pinned = () => {
         loadData();
     },[]);
 
-
-
-  const debounce=(fn,delay)=>{
-    let timer;
-    return (...args)=>{
-      clearTimeout(timer);
-      timer=setTimeout(()=>fn(...args),delay);
-    }
-  }
-
-  const handleSearch=async(query)=>{
-    if(!query){
-      loadData();
-      return;
-    }
-    try{
-      const response=await axios.get(`http://localhost:5001/notes/search?q=${query}&isPinned=true`,{
-        headers:{
-          Authorization:`Bearer ${localStorage.getItem('token')}`
+    const debounce=(fn,delay)=>{
+        let timer;
+        return(...args)=>{
+            clearTimeout(timer);
+            timer=setTimeout(()=>fn(...args),delay);
         }
-      });
-      setNotes(response.data);
-      
-
-    }catch(e){
-      if(e.response && e.response.data){
-        setError(e.response.data);
-      }
-      else{
-        setError("Something went wrong");
-      }
-
     }
-  }
 
-  const debouncedSearch=debounce(handleSearch,500)
+    const handleSearch=async(query)=>{
+        try{
+            const response=await axios.get(`http://localhost:5001/notes/search?q=${query}&isDeleted=true`,{
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setNotes(response.data);
+
+        }catch(e){
+            if(e.response && e.response.data){
+                setError(e.response.data);
+            }
+            else{
+                setError("Something went wrong while fetching deleted search");
+            }
+
+        }
+    }
+
+    const debouncedSearch=debounce(handleSearch,500);
+
+    const handleRestore=async(noteId)=>{
+        try{
+            const response=await axios.patch(`http://localhost:5001/notes/restore/${noteId}`,{},{
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                }
+            });
+            loadData();
+
+        }catch(e){
+            if(e.response && e.response.data){
+                setError(e.response.data);
+            }
+            else{
+                setError("Something went wrong with restoring");
+            }
+
+        }
+    }
+
+    
   return (
     <div className="flex min-h-screen bg-[#FFFDF9]">
       {/* SIDEBAR */}
@@ -97,9 +113,9 @@ const Pinned = () => {
           <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Archive
           </p>
-          <Link to='/trash' className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
+          <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Trash
-          </Link>
+          </p>
           
         </nav>
       </aside>
@@ -126,10 +142,8 @@ const Pinned = () => {
             {/* Header row */}
             <div className="flex items-center gap-4 mb-6">
               <h2 className="text-3xl font-semibold text-[#2E2E2E]">
-                My Pinned Notes
+                My Trash
               </h2>
-
-              
             </div>
 
             {/* NOTES GRID */}
@@ -154,7 +168,14 @@ const Pinned = () => {
                     </p>
                   </div>
 
-                  
+                  <div className="flex justify-end mt-2 gap-x-4">
+                    <button
+                    onClick={() => handleRestore(note._id)}
+                    className="text-sm text-red-500 hover:underline"
+                  >
+                    Restore
+                  </button>
+                </div>
                 </div>
               ))}
             </div>
@@ -165,9 +186,8 @@ const Pinned = () => {
           </div>
         </main>
       </div>
-
     </div>
   )
 }
 
-export default Pinned
+export default Trash

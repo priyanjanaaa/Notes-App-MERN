@@ -4,6 +4,7 @@ import Signup from './components/Signup.jsx';
 import Login from './components/Login.jsx';
 import Home from './components/Home.jsx';
 import Pinned from './components/Pinned.jsx';
+import Trash from './components/Trash.jsx';
 
 
 function App() {
@@ -14,10 +15,12 @@ function App() {
     
     <BrowserRouter>
     <Routes>
-      <Route path='/' element={<Home />}></Route>
-      <Route path='/register' element={<Signup />}></Route>
+      <Route path='/' element={<Signup />}></Route>
+      <Route path='/home' element={<Home />}></Route>
       <Route path='/login' element={<Login />}></Route>
       <Route path='/pinned' element={<Pinned />}></Route>
+      <Route path='/trash' element={<Trash />}></Route>
+
     </Routes>
     </BrowserRouter>
     
