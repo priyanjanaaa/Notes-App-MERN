@@ -93,38 +93,6 @@ export const loginRoute=async(req,res)=>{
     }
 }
 
-/*export const addRoute=async(req,res)=>{
-    try{
-        const{title,body}=req.body;
-        if(!title||!body){
-            return res.status(400).send("Please fill all details correctly");
-        }
-        const userId = req.user.id;
-        const note=await notesModel.create({
-            userId,
-            title,
-            body
-        });
-        
-
-        res.status(201).json(note)
-
-
-    }catch(e){
-        res.status(500).send("Server Error")
-
-    }
-}
-
-export const viewnotesRoute=async(req,res)=>{
-    try{
-        const notes=await notesModel.find({ userId: req.user.id });
-        res.status(200).json(notes);
-    }catch(e){
-        res.status(500).send("Server Error");
-    }
-
-}*/
 
 export const addRoute=async(req,res)=>{
     try{
@@ -156,41 +124,132 @@ export const viewnotesRoute=async(req,res)=>{
     }
 }
 
+
 export const deleteRoute=async(req,res)=>{
     try{
         const noteId=req.params.id;
-        if(!noteId){
-           return  res.status(409).send("Invalid request,the note doesnt exist");
-        }
-        const deleted=await notesModel.findOneAndDelete({
-            _id:noteId,
-            userId:req.user.id
-        });
+        const deleted=await notesModel.findOneAndUpdate({_id:noteId,userId:req.user.id},
+            {isDeleted:true},
+            {new:true}
+        )
+
         res.status(200).json(deleted);
-        
 
     }catch(e){
         res.status(500).send("Server Error");
+
     }
 }
+
 
 export const searchRoute=async(req,res)=>{
     try{
         const keyword=req.query.q;
-        if(!keyword||keyword.trim()===""){
-            res.status(400).send("Search cannot be empty");
-        }
-        const searched=await notesModel.find({
-            userId:req.user.id,
+        const pinned=req.query.isPinned==="true";
+        const del=req.query.isDeleted==="true";
+        const result={userId:req.user.id,
             $or:[
                 {title:{$regex:keyword,$options:"i"}},
                 {body:{$regex:keyword,$options:"i"}}
             ]
-        })
+        };
+        if(pinned){
+            result.isPinned=true;
+        }
+        else if(del){
+            result.isDeleted=true;
+        }
+        const searched=await notesModel.find(result);
         res.status(200).json(searched);
+
+
+    }catch(e){
+        res.status(500).send("Server error");
+    }
+}
+
+export const pinRoute=async(req,res)=>{
+    try{
+        const noteId=req.params.id;
+        if(!noteId){
+            res.status(400).send("Invalid Request");
+        }
+        const pinned=await notesModel.findOneAndUpdate({
+            _id:noteId,
+            userId:req.user.id
+        },
+        {isPinned:true},
+        {new:true})
+        res.status(200).json(pinned);
 
     }catch(e){
         res.status(500).send("Server Error");
+
+    }
+}
+
+export const unpinRoute=async(req,res)=>{
+    try{
+        const noteId=req.params.id;
+        if(!noteId){
+            res.status(400).send("Invalid request");
+        }
+        const unpinned=await notesModel.findOneAndUpdate({_id:noteId,userId:req.user.id},
+            {isPinned:false},
+            {new:true}
+        )
+        res.status(200).json(unpinned);
+
+    }catch(e){
+        res.status(500).send("Server error");
+
+    }
+}
+
+export const getpinpageRoute=async(req,res)=>{
+    try{
+        const pinnedpage=await notesModel.find({userId:req.user.id,isPinned:true});
+        res.status(200).json(pinnedpage);
+
+    }catch(e){
+        res.status(500).send("Server Error");
+    }
+
+}
+
+export const trashRoute=async(req,res)=>{
+    try{
+        const trash=await notesModel.find({
+            userId:req.user.id,
+            isDeleted:true
+        }
+        )
+        res.status(200).json(trash);
+
+    }catch(e){
+        res.status(500).send("Server Error");
+
+    }
+}
+
+export const restoreRoute=async(req,res)=>{
+    try{
+        const noteId=req.params.id;
+        if(!noteId){
+            res.status(400).send("Invalid request for restore")
+        }
+        const restored=await notesModel.findOneAndUpdate({
+            _id:noteId,
+            userId:req.user.id
+        },{
+            isDeleted:false,
+        },{
+            new:true
+        })
+        res.status(200).json(restored);
+
+    }catch(e){
+        res.status(500).send("Server Error")
 
     }
 }

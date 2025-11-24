@@ -14,6 +14,14 @@ const notesSchema=new mongoose.Schema({
         ref:"users",
         required:true
 
+    },
+    isPinned:{
+        type:Boolean,
+        default:false
+    },
+    isDeleted:{
+        type:Boolean,
+        default:false
     }
 })
 

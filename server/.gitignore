@@ -1,2 +1,4 @@
 node_modules
 .env
+.Homie.jsx
+.Backup.jsx
