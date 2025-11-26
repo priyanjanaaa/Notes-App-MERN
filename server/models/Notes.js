@@ -22,6 +22,10 @@ const notesSchema=new mongoose.Schema({
     isDeleted:{
         type:Boolean,
         default:false
+    },
+    isArchived:{
+        type:Boolean,
+        default:false
     }
 })
 

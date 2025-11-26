@@ -147,6 +147,7 @@ export const searchRoute=async(req,res)=>{
         const keyword=req.query.q;
         const pinned=req.query.isPinned==="true";
         const del=req.query.isDeleted==="true";
+        const archive=req.query.isArchived==="true";
         const result={userId:req.user.id,
             $or:[
                 {title:{$regex:keyword,$options:"i"}},
@@ -158,6 +159,9 @@ export const searchRoute=async(req,res)=>{
         }
         else if(del){
             result.isDeleted=true;
+        }
+        else if(archive){
+            result.isArchived=true;
         }
         const searched=await notesModel.find(result);
         res.status(200).json(searched);
@@ -251,5 +255,43 @@ export const restoreRoute=async(req,res)=>{
     }catch(e){
         res.status(500).send("Server Error")
 
+    }
+}
+
+export const archiveRoute=async(req,res)=>{
+    try{
+        const noteId=req.params.id;
+        const archived=await notesModel.findOneAndUpdate({_id:noteId,userId:req.user.id},
+            {isArchived:true},
+            {new:true}
+        )
+        res.status(200).json(archived);
+
+    }catch(e){
+        res.status(500).send("Server Error");
+
+    }
+}
+
+export const archivedPageRoute=async(req,res)=>{
+    try{
+        const archivedPage=await notesModel.find({userId:req.user.id,isArchived:true});
+        res.status(200).json(archivedPage);
+
+    }catch(e){
+        res.status(500).send("Server Error")
+    }
+}
+
+export const unarchiveRoute=async(req,res)=>{
+    try{
+        const noteId=req.params.id;
+        const unarchived=await notesModel.findOneAndUpdate({_id:noteId,userId:req.user.id},
+            {isArchived:false}
+        )
+        res.status(200).json(unarchived);
+
+    }catch(e){
+        res.status(500).send("Server Error");
     }
 }
