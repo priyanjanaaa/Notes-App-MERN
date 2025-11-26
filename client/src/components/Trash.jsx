@@ -110,9 +110,9 @@ const Trash = () => {
           <Link to="/pinned" className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide" >
             Pinned
           </Link>
-          <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
+          <Link to='/archived' className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Archive
-          </p>
+          </Link>
           <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Trash
           </p>

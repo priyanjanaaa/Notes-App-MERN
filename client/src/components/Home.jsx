@@ -29,6 +29,7 @@ const Home = () => {
         }
     })
     const sorted=response.data.filter((n)=>!n.isDeleted)
+    .filter((n)=>!n.isArchived)
     .sort((a,b)=>b.isPinned-a.isPinned)
     setNotes(sorted);
 
@@ -177,6 +178,28 @@ const Home = () => {
     }
   }
 
+  const handleArchive=async(noteId)=>{
+    try{
+      const response=await axios.patch(`http://localhost:5001/notes/archive/${noteId}`,{},{
+        headers:{
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      loadData();
+
+
+    }catch(e){
+      if(e.response && e.response.data){
+        setError(e.response.data);
+
+      }
+      else{
+        setError("Something went wrong");
+      }
+
+    }
+  }
+
  
   return (
       <div className="flex min-h-screen bg-[#FFFDF9]">
@@ -198,9 +221,9 @@ const Home = () => {
           <Link to="/pinned" className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide" >
             Pinned
           </Link>
-          <p className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
+          <Link to='/archived' className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Archive
-          </p>
+          </Link>
           <Link to='/trash' className="cursor-pointer text-[#2E2E2E] text-l font-bold tracking-wide">
             Trash
           </Link>
@@ -277,6 +300,8 @@ const Home = () => {
                   >
                     Delete
                   </button>
+                  <button onClick={() => handleArchive(note._id)}
+                    className="text-sm text-red-500 hover:underline">Archive</button>
                 </div>
                 </div>
               ))}
