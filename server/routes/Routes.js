@@ -295,3 +295,23 @@ export const unarchiveRoute=async(req,res)=>{
         res.status(500).send("Server Error");
     }
 }
+
+export const updateRoute=async(req,res)=>{
+    try{
+        const noteId=req.params.id;
+        const updates={};
+        if(req.body.title) updates.title=req.body.title;
+        if(req.body.body)  updates.body=req.body.body;
+        const updated=await notesModel.findOneAndUpdate({_id:noteId,userId:req.user.id},
+            {$set:updates},
+            {new:true}
+        )
+        if(!updated){
+            res.status(400).send("No such note");
+        }
+        res.status(200).json(updated);
+
+    }catch(e){
+        res.status(500).send("Server Error");
+    }
+}

@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import cors from 'cors'
-import { signupRoute,loginRoute,addRoute,viewnotesRoute,deleteRoute,searchRoute, pinRoute, unpinRoute,getpinpageRoute,trashRoute,restoreRoute,archiveRoute,archivedPageRoute,unarchiveRoute } from './routes/Routes.js'
+import { signupRoute,loginRoute,addRoute,viewnotesRoute,deleteRoute,searchRoute, pinRoute, unpinRoute,getpinpageRoute,trashRoute,restoreRoute,archiveRoute,archivedPageRoute,unarchiveRoute,updateRoute } from './routes/Routes.js'
 import { authMiddleware } from './middleware/authMiddleware.js'
 dotenv.config();
 const app=express();
@@ -27,6 +27,7 @@ app.patch('/notes/restore/:id',authMiddleware,restoreRoute);
 app.patch('/notes/archive/:id',authMiddleware,archiveRoute);
 app.get('/notes/archived',authMiddleware,archivedPageRoute);
 app.patch('/notes/unarchive/:id',authMiddleware,unarchiveRoute);
+app.patch('/notes/update/:id',authMiddleware,updateRoute);
 app.listen(PORT,()=>{
     console.log(`Server running on port ${PORT}`);
 })
