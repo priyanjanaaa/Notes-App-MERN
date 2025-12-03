@@ -19,3 +19,17 @@
 .font-extrabold {
   font-weight: 900;
 }
+.light-mode {
+  background-color: #fffdf9;
+  color: black;
+}
+
+.dark-mode {
+  background-color: #000;
+  color: white;
+}
+
+html, body {
+  transition: background-color 0.3s, color 0.3s;
+}
+

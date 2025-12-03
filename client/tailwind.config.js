@@ -1,12 +1,15 @@
 /** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: [
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    // Enable full default Tailwind theme including typography utilities
-    presets: [require("tailwindcss/defaultConfig")],
+    extend: {},
   },
   plugins: [],
-}
+};
+
